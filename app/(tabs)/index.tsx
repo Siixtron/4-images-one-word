@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, TouchableOpacity, Alert } from 'react-native';
 import styled from 'styled-components';
 
@@ -41,7 +41,7 @@ const LetterGrid = styled(View)`
 `;
 
 const LetterButton = styled(TouchableOpacity)`
-  width: 40px;
+  width: 45px;
   height: 40px;
   margin: 5px;
   background-color: #fff;
@@ -51,45 +51,53 @@ const LetterButton = styled(TouchableOpacity)`
 `;
 
 const HomeScreen = () => {
-  const correctAnswer = ['D', 'O', 'O', 'R'];
-  const WordLength = Array(correctAnswer.length).fill('');
-  const RandomLetter = ['E', 'R', 'O', 'S', 'I', 'R', 'R', 'E', 'M', 'F', 'A', 'D', 'J','H']
-  const [availableLetters, setAvailableLetters] = useState<string[]>(RandomLetter);
-  const [pickedLetters, setPickedLetters] = useState<{ letter: string; index: number }[]>([]);
-  const [selectedLetters, setSelectedLetters] = useState<string[]>(WordLength);
+  const correctAnswer: string[] = ['D', 'O', 'O', 'R'];
+  const initialLetters: { letter: string; id: number; }[] = [
+    { letter: 'E', id: 0 }, { letter: 'R', id: 1 }, { letter: 'O', id: 2 },
+    { letter: 'S', id: 3 }, { letter: 'I', id: 4 }, { letter: 'R', id: 5 },
+    { letter: 'R', id: 6 }, { letter: 'E', id: 7 }, { letter: 'M', id: 8 },
+    { letter: 'F', id: 9 }, { letter: 'A', id: 10 }, { letter: 'D', id: 11 },
+  ];
 
-  const handleLetterPress = (letter: string, index: number) => {
+  const [availableLetters, setAvailableLetters] = useState(initialLetters);
+  const [selectedLetters, setSelectedLetters] = useState(Array(correctAnswer.length).fill(''));
+
+  const handleLetterPress = (selectedLetter: { letter: string; id: number; }) => {
     const emptyIndex = selectedLetters.indexOf('');
-    const prevAvailableLetter = [...availableLetters];
-    const prevSelectedLetter = [...selectedLetters];
-    prevSelectedLetter[emptyIndex] = letter;
-    setSelectedLetters(prevSelectedLetter);
-    prevAvailableLetter[index] = '';
-    setAvailableLetters(prevAvailableLetter);
-    setPickedLetters([...pickedLetters, { letter, index }]);
-    console.log(pickedLetters);
+  
+    setSelectedLetters((prev) => {
+      const newSelected = [...prev];
+      newSelected[emptyIndex] = selectedLetter;
+      return newSelected;
+    });
+
+    setAvailableLetters((prev) =>
+      prev.map((letter) => (letter.id === selectedLetter.id ? { ...letter, letter: '' } : letter))
+    );
+  };
+  
+  const handleUnselectedLetter = (removedLetter: { id: number; letter: string; }) => {
+    setSelectedLetters((prev) =>
+      prev.map((letter) => (letter.id === removedLetter.id ? '' : letter))
+    );
+  
+    setAvailableLetters((prev) =>
+      prev.map((letter) => (letter.id === removedLetter.id ? { ...letter, letter: removedLetter.letter } : letter))
+    );
   };
 
-  const handleUnselectedLetter = (letter: string, index: number) => {
-    const prevSelectedLetter = [...selectedLetters];  
-    prevSelectedLetter[index] = '';
-    setSelectedLetters(prevSelectedLetter);
   
-    const prevAvailableLetter = [...availableLetters];
-    prevAvailableLetter[index] = letter;
-    setAvailableLetters(prevAvailableLetter);
-  
-    setPickedLetters(pickedLetters.filter(p => p.letter !== letter));
-  };
-
-  const checkAnswer = () => {
-    if (selectedLetters.join('') === correctAnswer.join('')) {
-      Alert.alert('Correct!', 'You guessed the right word!');
-    } else {
-      Alert.alert('Try Again!', 'Incorrect guess, try again.');
-      setSelectedLetters(WordLength);
+  useEffect(() => {
+    if (!selectedLetters.includes('')) {
+      if(selectedLetters.join('') === correctAnswer.join('')) {
+        Alert.alert('Correct!', 'You guessed the right word!');
+      } else {
+        Alert.alert('Try Again!', 'Incorrect guess, try again.');
+        setSelectedLetters(Array(correctAnswer.length).fill(''));
+        setAvailableLetters(initialLetters.map((letter) => ({ ...letter, letter: letter.letter }))); // Reset available letters
+      }
     }
-  };
+  }, [selectedLetters]);
 
   return (
     <Container>
@@ -102,23 +110,19 @@ const HomeScreen = () => {
       
       <WordBox>
         {selectedLetters.map((letter, index) => (
-          <LetterButton key={index} onPress={() => handleUnselectedLetter(letter, index)}>
-            <LetterText>{letter || ''}</LetterText>
+          <LetterButton key={index} onPress={() => handleUnselectedLetter(letter)}>
+            <LetterText>{letter?.letter}</LetterText>
           </LetterButton>
         ))}
       </WordBox>
 
       <LetterGrid>
-        {availableLetters.map((letter, index) => (
-          <LetterButton key={index} onPress={() => handleLetterPress(letter, index)}>
-            <LetterText>{letter}</LetterText>
+        {availableLetters.map((letter) => (
+          <LetterButton disabled={letter.letter === '' || !selectedLetters.includes('')} key={letter.id} onPress={() => handleLetterPress(letter)}>
+            <LetterText>{letter?.letter}</LetterText>
           </LetterButton>
         ))}
       </LetterGrid>
-
-      <TouchableOpacity onPress={checkAnswer} style={{ marginTop: 20, backgroundColor: '#ffcc00', padding: 15, borderRadius: 5 }}>
-        <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Submit</Text>
-      </TouchableOpacity>
     </Container>
   );
 };
