@@ -54,7 +54,7 @@ const HomeScreen = () => {
   const correctAnswer: string[] = ['D', 'O', 'O', 'R'];
   const initialLetters: { letter: string; id: number; }[] = [
     { letter: 'E', id: 0 }, { letter: 'R', id: 1 }, { letter: 'O', id: 2 },
-    { letter: 'S', id: 3 }, { letter: 'I', id: 4 }, { letter: 'R', id: 5 },
+    { letter: 'S', id: 3 }, { letter: 'O', id: 4 }, { letter: 'R', id: 5 },
     { letter: 'R', id: 6 }, { letter: 'E', id: 7 }, { letter: 'M', id: 8 },
     { letter: 'F', id: 9 }, { letter: 'A', id: 10 }, { letter: 'D', id: 11 },
   ];
@@ -86,15 +86,17 @@ const HomeScreen = () => {
     );
   };
 
-  
+  console.log('selected', selectedLetters.map((letter) => letter.letter).join(''));
+  console.log('correct', correctAnswer.join(''));
+
   useEffect(() => {
     if (!selectedLetters.includes('')) {
-      if(selectedLetters.join('') === correctAnswer.join('')) {
+      if(selectedLetters.map((letter) => letter.letter).join('') === correctAnswer.join('')) {
         Alert.alert('Correct!', 'You guessed the right word!');
       } else {
         Alert.alert('Try Again!', 'Incorrect guess, try again.');
         setSelectedLetters(Array(correctAnswer.length).fill(''));
-        setAvailableLetters(initialLetters.map((letter) => ({ ...letter, letter: letter.letter }))); // Reset available letters
+        setAvailableLetters(initialLetters.map((letter) => ({ ...letter, letter: letter.letter }))); 
       }
     }
   }, [selectedLetters]);
