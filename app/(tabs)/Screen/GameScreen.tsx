@@ -86,9 +86,9 @@ const GamesScreen = (
           setModalVisible(false); 
           fetchNewWord();
         }} 
-        label="Bien joué ! Niveau Suivant ?" 
+        label="Next Level" 
       />
-      {/* <Button title='Restart' onPress={fetchNewWord}/> */}
+
     </Container>
   );
 };

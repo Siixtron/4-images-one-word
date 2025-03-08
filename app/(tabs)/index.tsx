@@ -15,14 +15,15 @@ const HomeScreen = () => {
     word ? `https://api.pexels.com/v1/search?query=${word[0]}&per_page=4` : null,
     fetcher
   );
-  const initialLetters = generateInitialLetters(word[0]);
-
   if (wordLoading || imagesLoading) {
     return <Loader />;
   }
   if (wordError || imagesError) {
     Alert.alert('Error', 'Failed to load data');
   }
+
+  const initialLetters = generateInitialLetters(word[0]);
+
   return <GameScreen word={word} images={images?.photos} fetchNewWord={fetchNewWord} initialLetters={initialLetters}/>;
 };
 
