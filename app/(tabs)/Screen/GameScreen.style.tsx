@@ -41,6 +41,7 @@ export const LetterGrid = styled(View)`
   flex-wrap: wrap;
   max-width: 95%;
   justify-content: flex-end;
+  margin-right: 2px;
 `;
 
 export const LetterButton = styled(TouchableOpacity)`
@@ -81,6 +82,7 @@ export const EraseButton = styled(TouchableOpacity)`
 `;
 
 export const Column = styled(View)`
+  padding: 8px;
   flex-direction: row;
 
 `;
