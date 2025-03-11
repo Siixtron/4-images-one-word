@@ -33,13 +33,13 @@ const Container = styled(View)`
   flex: 1;
   justify-content: center;
   align-items: center;
-  background-color: #CCFCCB;
+  background-color: #17206e;
 `;
 
 const AnimatedBall = styled(Animated.View)`
   width: 50px;
   height: 50px;
-  background-color: #4caf50;
+  background-color: #FFFF;
   border-radius: 25px;
 `;
 

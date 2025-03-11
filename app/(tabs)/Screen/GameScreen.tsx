@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Alert } from 'react-native';
+import { Alert, Button } from 'react-native';
 import GameModal from '@/components/Modal';
 import uuid from 'react-native-uuid';
-import { Container, GameImage, ImageGrid, LetterButton, LetterGrid, LetterSelectedButton, LetterText, WordBox } from './GameScreen.style';
+import { Column, Container, EraseButton, GameImage, ImageGrid, LetterButton, LetterGrid, LetterSelectedButton, LetterText, WordBox } from './GameScreen.style';
+import Animated, { useSharedValue, withSequence, withRepeat, withTiming, useAnimatedStyle } from 'react-native-reanimated';
 
 
 const GamesScreen = (
@@ -16,6 +17,8 @@ const GamesScreen = (
   const [modalVisible, setModalVisible] = useState(false);
   const [availableLetters, setAvailableLetters] = useState(initialLetters);
   const [selectedLetters, setSelectedLetters] = useState(Array(correctAnswer.length).fill(''));
+  const [isWrong, setIsWrong] = useState(false);
+  const isCorrect = selectedLetters.map((letter) => letter.letter).join('') === correctAnswer.join('') && !!selectedLetters;
 
   const handleLetterPress = (selectedLetter: { letter: string; id: number; }) => {
     const emptyIndex = selectedLetters.indexOf('');
@@ -41,15 +44,29 @@ const GamesScreen = (
     );
   };
 
+  const shakeAnimation = useSharedValue(2);
+
+  const triggerShake = () => {
+    shakeAnimation.value = withSequence(
+      withRepeat(withTiming(10, { duration: 200 }), 6, true),
+    );
+  };
+
+  const animatedWordBoxStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: shakeAnimation.value }],
+
+  }));
+
   useEffect(() => {
     if (!selectedLetters.includes('')) {
-      if(selectedLetters.map((letter) => letter.letter).join('') === correctAnswer.join('') && !!selectedLetters && !!correctAnswer) {
+      if(isCorrect) {
         setModalVisible(true);
       } else {
-        Alert.alert('Try Again!', 'Incorrect guess, try again.');
-        setSelectedLetters(Array(correctAnswer.length).fill(''));
-        setAvailableLetters(initialLetters.map((letter) => ({ ...letter, letter: letter.letter }))); 
+        setIsWrong(true);
+        triggerShake();
       }
+    } else {
+      setIsWrong(false);
     }
   }, [selectedLetters]);
 
@@ -64,14 +81,17 @@ const GamesScreen = (
         ))}
       </ImageGrid>
       
+      <Animated.View style={animatedWordBoxStyle}>
       <WordBox>
         {selectedLetters.map((letter, index) => (
-          <LetterSelectedButton key={index} onPress={() => handleUnselectedLetter(letter)}>
+          <LetterSelectedButton isWrong={isWrong} key={index} onPress={() => handleUnselectedLetter(letter)}>
             <LetterText>{letter?.letter}</LetterText>
           </LetterSelectedButton>
         ))}
       </WordBox>
+      </Animated.View>
 
+      <Column>
       <LetterGrid>
         {availableLetters.map((letter) => (
           <LetterButton disabled={letter.letter === '' || !selectedLetters.includes('')} key={letter.id} onPress={() => handleLetterPress(letter)}>
@@ -80,15 +100,19 @@ const GamesScreen = (
         ))}
       </LetterGrid>
 
-      <GameModal
+      <EraseButton onPress={() => setSelectedLetters(correctAnswer.fill(''))}>
+          <LetterText>Clear</LetterText>
+      </EraseButton>
+      </Column>
+
+      {isCorrect && <GameModal
         visible={modalVisible} 
         onClose={() => {
           setModalVisible(false); 
           fetchNewWord();
-        }} 
-        label="Next Level" 
-      />
-
+        }}
+        label="Next Level" /> 
+      }
     </Container>
   );
 };

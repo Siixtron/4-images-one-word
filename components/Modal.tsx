@@ -49,7 +49,7 @@ const AnimatedModalContent = styled(Animated.View)`
   justify-content: center;
   align-items: center;
   border-radius: 10px;
-  background-color: #ccfccb;
+  background-color: #17206e;
   padding: 20px;
   margin-bottom: 20px;
 `;
@@ -58,12 +58,12 @@ const ModalText = styled(Text)`
   font-size: 18px;
   font-weight: bold;
   margin-bottom: 20px;
-  color: #333333;
+  color: #FFFF;
 `;
 
 const CloseButton = styled(TouchableOpacity)`
   padding: 10px;
-  background-color: #4caf50;
+  background-color: red;
   border-radius: 5px;
 `;
 

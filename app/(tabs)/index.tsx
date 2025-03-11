@@ -7,6 +7,8 @@ import useSWR from 'swr';
 import generateInitialLetters from '@/utils/initialLetterGenerator';
 
 const HomeScreen = () => {
+
+  
   const { data: word, error: wordError, isLoading: wordLoading , mutate: fetchNewWord } = useSWR(
     `https://random-word-api.vercel.app/api?words=1&length=${Math.floor(Math.random() * 5) + 3}`,
     fetcher
