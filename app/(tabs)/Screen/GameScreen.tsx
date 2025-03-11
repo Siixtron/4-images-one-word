@@ -44,6 +44,11 @@ const GamesScreen = (
     );
   };
 
+  const handleClear = () => {
+    setSelectedLetters(correctAnswer.fill('')); 
+    setAvailableLetters(initialLetters);
+  }
+
   const shakeAnimation = useSharedValue(2);
 
   const triggerShake = () => {
@@ -100,7 +105,7 @@ const GamesScreen = (
         ))}
       </LetterGrid>
 
-      <EraseButton onPress={() => setSelectedLetters(correctAnswer.fill(''))}>
+      <EraseButton onPress={handleClear}>
           <LetterText>Clear</LetterText>
       </EraseButton>
       </Column>
